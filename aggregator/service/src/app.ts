@@ -1,10 +1,6 @@
 import express, { Application, NextFunction, Request, Response } from 'express';
-import axios from 'axios';
-
-const services = {
-    recipe: 'http://recipe-service/',
-    user: 'http://user-service',
-};
+import { UserController } from './controller';
+import { RouteDefinition } from './type';
 
 export default class App {
     private app: Application;
@@ -21,10 +17,20 @@ export default class App {
     }
 
     private registerRoutes () {
-        this.app.post('/user/register', async (request: Request, response: Response, next: NextFunction) => {
-            axios.post(`${services.user}/register`, request.body, { validateStatus: () => true })
-                .then((res) => response.status(res.status).json(res.data))
-                .catch(next);
+        [
+            UserController,
+        ].forEach((Controller) => {
+            const prefix = Reflect.getMetadata('prefix', Controller);
+            const routes: RouteDefinition<typeof Controller>[] = Reflect.getMetadata('routes', Controller) || [];
+
+            routes.forEach((route) => {
+                function routeHandler (request: Request, response: Response, next: NextFunction): void {
+                    const result = new Controller()[route.methodName](request, response, next);
+                    result.catch(next);
+                }
+
+                this.app[route.requestMethod](`${prefix}${route.path}`, routeHandler);
+            });
         });
 
         this.app.use((err: any, _request: Request, response: Response, _next: NextFunction) => {

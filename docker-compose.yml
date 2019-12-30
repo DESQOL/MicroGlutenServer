@@ -83,6 +83,8 @@ services:
   user-database:
     image: mysql:5.7.28
     container_name: user-database
+    ports:
+      - 3306:3306
     volumes:
       - './user/database:/var/lib/mysql'
     restart: always

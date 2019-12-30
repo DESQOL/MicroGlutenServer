@@ -32,11 +32,38 @@ export default class App {
                 });
             }
 
-            user = repoUser.create({ email, password });
+            user = repoUser.create({ email });
+            user.password = await User.hashPassword(password);
             user = await repoUser.save(user);
+
+            user = await repoUser.findOne({ where: { email }, cache: false });
+            response.status(200).json(user);
+        }
+
+        async function login (request: Request, response: Response, _next: NextFunction) {
+            const { email, password } = request.body;
+
+            const user = await repoUser.findOne({ where: { email } });
+            if (!user) {
+                return response.status(403).json({
+                    message: 'Incorrect email or password.',
+                });
+            }
+
+            const match = await user.validatePassword(password);
+            if (!match) {
+                return response.status(403).json({
+                    message: 'Incorrect email or password.',
+                });
+            }
 
             response.status(200).json(user);
         }
+
+        this.app.post('/login', async (request: Request, response: Response, next: NextFunction) => {
+            login(request, response, next)
+                .catch(next);
+        });
 
         this.app.post('/register', async (request: Request, response: Response, next: NextFunction) => {
             register(request, response, next)
@@ -44,8 +71,6 @@ export default class App {
         });
 
         this.app.use((err: any, _request: Request, response: Response, _next: NextFunction) => {
-            console.log(err);
-
             response.status(err.status || 500).json({
                 message: err.message,
                 errors: err.errors,

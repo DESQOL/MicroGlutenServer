@@ -1,19 +1,19 @@
-import express, { Application, Request, Response } from 'express'
+import express, { Application, Request, Response } from 'express';
 
 export default class App {
-    private app: Application
+    private app: Application;
 
-    constructor() {
+    constructor () {
         this.app = express();
 
         this.registerRoutes();
     }
 
-    public listen() {
-        this.app.listen(80, 'recipe-service', () => console.log('Service: `recipe` is ready for HTTP requests!'))
+    public listen () {
+        this.app.listen(80, 'recipe-service', () => console.log('Service: `recipe` is ready for HTTP requests!'));
     }
 
-    private registerRoutes() {
-        this.app.get('/', (_request: Request, response: Response) => response.send('Hello World!'))
+    private registerRoutes () {
+        this.app.get('/', (_request: Request, response: Response) => response.send('Hello World!'));
     }
 }

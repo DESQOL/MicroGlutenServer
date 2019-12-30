@@ -1,26 +1,26 @@
-import express, { Application, Request, Response, NextFunction } from 'express';
+import express, { Application, NextFunction, Request, Response } from 'express';
 import axios from 'axios';
 
 const services = {
     recipe: 'http://recipe-service/',
     user: 'http://user-service',
-}
+};
 
 export default class App {
-    private app: Application
+    private app: Application;
 
-    constructor() {
+    constructor () {
         this.app = express();
         this.app.use(express.json());
 
         this.registerRoutes();
     }
 
-    public listen() {
+    public listen () {
         this.app.listen(80, 'aggregator-service', () => console.log('Service: `aggregator` is ready for HTTP requests!'));
     }
 
-    private registerRoutes() {
+    private registerRoutes () {
         this.app.post('/user/register', async (request: Request, response: Response, next: NextFunction) => {
             axios.post(`${services.user}/register`, request.body, { validateStatus: () => true })
                 .then((res) => response.status(res.status).json(res.data))

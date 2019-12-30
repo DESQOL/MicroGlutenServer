@@ -1,13 +1,13 @@
-import { ConnectionOptions } from "typeorm";
+import { ConnectionOptions } from 'typeorm';
 import appRoot from 'app-root-path';
 
 const databaseConfiguration: ConnectionOptions = {
-    type: "mysql",
-    host: "database",
+    type: 'mysql',
+    host: 'database',
     port: 3306,
-    username: "gluten",
-    password: "gluten",
-    database: "gluten",
+    username: 'gluten',
+    password: 'gluten',
+    database: 'gluten',
     synchronize: true,
     logging: false,
     entities: [
@@ -30,6 +30,6 @@ const databaseConfiguration: ConnectionOptions = {
         },
         duration: 1 * 1000
     }
-}
+};
 
 export { databaseConfiguration };

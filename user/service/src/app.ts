@@ -1,17 +1,17 @@
-import express, { Application, Request, Response, NextFunction } from 'express'
-import { getRepository, createConnection } from 'typeorm';
+import express, { Application, NextFunction, Request, Response } from 'express';
+import { createConnection, getRepository } from 'typeorm';
 import { User } from './entity';
 import { databaseConfiguration } from './config';
 
 export default class App {
-    private app: Application
+    private app: Application;
 
-    constructor() {
+    constructor () {
         this.app = express();
         this.app.use(express.json());
     }
 
-    public async listen() {
+    public async listen () {
         await createConnection(databaseConfiguration).then(() => {
             this.registerRoutes();
 
@@ -19,20 +19,20 @@ export default class App {
         });
     }
 
-    private registerRoutes() {
-        const repoUser = getRepository(User)
+    private registerRoutes () {
+        const repoUser = getRepository(User);
 
-        async function register (request: Request, response: Response, _next: NextFunction) {            
-            const { email, password } = request.body
+        async function register (request: Request, response: Response, _next: NextFunction) {
+            const { email, password } = request.body;
 
-            let user = await repoUser.findOne({ where: { email } })
+            let user = await repoUser.findOne({ where: { email } });
             if (user) {
                 return response.status(409).json({
                     message: 'Specified email address is already associated with an account.',
                 });
             }
 
-            user = repoUser.create({ email, password });            
+            user = repoUser.create({ email, password });
             user = await repoUser.save(user);
 
             response.status(200).json(user);
@@ -41,11 +41,11 @@ export default class App {
         this.app.post('/register', async (request: Request, response: Response, next: NextFunction) => {
             register(request, response, next)
                 .catch(next);
-        })
+        });
 
         this.app.use((err: any, _request: Request, response: Response, _next: NextFunction) => {
             console.log(err);
-            
+
             response.status(err.status || 500).json({
                 message: err.message,
                 errors: err.errors,

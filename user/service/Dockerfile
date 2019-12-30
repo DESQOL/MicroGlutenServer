@@ -27,6 +27,7 @@ WORKDIR /usr/src/app
 
 COPY --from=build /tmp/dist ./dist
 COPY --from=build /tmp/prod_node_modules ./node_modules
+COPY --from=build /tmp/package*.json ./
 
 #
 # ---- Production ----

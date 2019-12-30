@@ -39,4 +39,4 @@ EXPOSE 80 443
 # Run the process under the node, aka unprivileged, user
 # USER node
 
-CMD [ "/opt/wait-for-it.sh", "cache:6379", "--",  "/opt/wait-for-it.sh", "database:3306", "--", "node", "dist/server.js" ]
+CMD [ "node", "dist/server.js" ]

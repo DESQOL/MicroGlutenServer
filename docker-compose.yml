@@ -1,0 +1,71 @@
+version: '3.7'
+
+services:
+  #
+  # ---- Recipe service and related ----
+  recipe-service:
+    build: ./recipe/service
+    container_name: recipe-service
+    volumes:
+      - ./scripts:/opt
+    links:
+      - recipe-cache:cache
+      - recipe-database:database
+    networks:
+      - services
+      - recipe-service
+  
+  recipe-cache:
+    image: redis:5.0.7
+    volumes:
+      - './recipe/cache:/data'
+    restart: always
+    networks:
+      - recipe-service
+
+  recipe-database:
+    image: mysql:5.7.28
+    volumes:
+      - './recipe/database:/var/lib/mysql'
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    networks:
+      - recipe-service
+  
+  #
+  # ---- User service and related ----
+  user-service:
+    build: ./user/service
+    container_name: user-service
+    volumes:
+      - ./scripts:/opt
+    links:
+      - user-cache:cache
+      - user-database:database
+    networks:
+      - services
+      - user-service
+  
+  user-cache:
+    image: redis:5.0.7
+    volumes:
+      - './user/cache:/data'
+    restart: always
+    networks:
+      - user-service
+
+  user-database:
+    image: mysql:5.7.28
+    volumes:
+      - './user/database:/var/lib/mysql'
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    networks:
+      - user-service
+
+networks:
+  services:
+  user-service:
+  recipe-service:

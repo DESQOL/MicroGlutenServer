@@ -1,5 +1,6 @@
 import express, { Application, NextFunction, Request, Response } from 'express';
 import { createConnection, getRepository } from 'typeorm';
+import { validate } from 'class-validator';
 import { User } from './entity';
 import { databaseConfiguration } from './config';
 
@@ -25,6 +26,14 @@ export default class App {
         async function register (request: Request, response: Response, _next: NextFunction) {
             const { email, password } = request.body;
 
+            const errors = await validate(User.from({ email, password }), { validationError: { target: false, value: false } });
+            if (errors.length > 0) {
+                return response.status(400).json({
+                    message: 'The server could not understand the request due to invalid syntax.',
+                    errors,
+                });
+            }
+
             let user = await repoUser.findOne({ where: { email } });
             if (user) {
                 return response.status(409).json({
@@ -36,12 +45,20 @@ export default class App {
             user.password = await User.hashPassword(password);
             user = await repoUser.save(user);
 
-            user = await repoUser.findOne({ where: { email }, cache: false });
+            user = await repoUser.findOne({ where: { email } });
             response.status(200).json(user);
         }
 
         async function login (request: Request, response: Response, _next: NextFunction) {
             const { email, password } = request.body;
+
+            const errors = await validate(User.from({ email, password }), { validationError: { target: false, value: false } });
+            if (errors.length > 0) {
+                return response.status(400).json({
+                    message: 'The server could not understand the request due to invalid syntax.',
+                    errors,
+                });
+            }
 
             const user = await repoUser.findOne({ where: { email } });
             if (!user) {

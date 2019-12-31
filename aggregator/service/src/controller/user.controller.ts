@@ -15,4 +15,16 @@ export class UserController {
         return getService('user').post('/login', request)
             .then((res) => response.status(res.status).json(res.data));
     }
+
+    @Route('post', '/update')
+    public async update (request: Request, response: Response, _next: NextFunction): Promise<Response> {
+        return getService('user').post('/update', request)
+            .then((res) => response.status(res.status).json(res.data));
+    }
+
+    @Route('get', '/search')
+    public async search (request: Request, response: Response, _next: NextFunction): Promise<Response> {
+        return getService('user').get('/search', request)
+            .then((res) => response.status(res.status).json(res.data));
+    }
 }

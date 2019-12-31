@@ -77,6 +77,42 @@ export default class App {
             response.status(200).json(user);
         }
 
+        async function update (request: Request, response: Response, _next: NextFunction) {
+            const { email, password, firstname, lastname } = request.body;
+
+            const errors = await validate(User.from({ email, password, firstname, lastname }), { validationError: { target: false, value: false } });
+            if (errors.length > 0) {
+                return response.status(400).json({
+                    message: 'The server could not understand the request due to invalid syntax.',
+                    errors,
+                });
+            }
+
+            let user = await repoUser.findOne({ where: { email } });
+            if (!user) {
+                return response.status(403).json({
+                    message: 'Incorrect email or password.',
+                });
+            }
+
+            const match = await user.validatePassword(password);
+            if (!match) {
+                return response.status(403).json({
+                    message: 'Incorrect email or password.',
+                });
+            }
+
+            user = await repoUser.preload({ id: user.id, email, firstname, lastname });
+            user = await repoUser.save(user);
+
+            response.status(200).json(user);
+        }
+
+        async function search (_request: Request, response: Response, _next: NextFunction) {
+            const users = await repoUser.find();
+            response.status(200).json(users);
+        }
+
         this.app.post('/login', async (request: Request, response: Response, next: NextFunction) => {
             login(request, response, next)
                 .catch(next);
@@ -84,6 +120,16 @@ export default class App {
 
         this.app.post('/register', async (request: Request, response: Response, next: NextFunction) => {
             register(request, response, next)
+                .catch(next);
+        });
+
+        this.app.post('/update', async (request: Request, response: Response, next: NextFunction) => {
+            update(request, response, next)
+                .catch(next);
+        });
+
+        this.app.get('/search', async (request: Request, response: Response, next: NextFunction) => {
+            search(request, response, next)
                 .catch(next);
         });
 

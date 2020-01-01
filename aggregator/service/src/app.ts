@@ -1,6 +1,6 @@
 import express, { Application, NextFunction, Request, Response } from 'express';
 import { UserController } from './controller';
-import { RouteDefinition } from './type';
+import { RouteDefinition, MiddlewareDefinition } from './type';
 
 export default class App {
     private app: Application;
@@ -24,12 +24,14 @@ export default class App {
             const routes: RouteDefinition<typeof Controller>[] = Reflect.getMetadata('routes', Controller) || [];
 
             routes.forEach((route) => {
+                const routeMiddleware = Reflect.getMetadata('routeMiddleware', Controller.prototype, route.methodName) as MiddlewareDefinition[] || [];
+
                 function routeHandler (request: Request, response: Response, next: NextFunction): void {
                     const result = new Controller()[route.methodName](request, response, next);
                     result.catch(next);
                 }
 
-                this.app[route.requestMethod](`${prefix}${route.path}`, routeHandler);
+                this.app[route.requestMethod](`${prefix}${route.path}`, routeMiddleware, routeHandler);
             });
         });
 

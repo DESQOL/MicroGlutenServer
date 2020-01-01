@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { Controller, Route } from '../decorator';
+import { Controller, Route, Scope } from '../decorator';
 import { getService } from '../helper';
 
 @Controller('/user')
@@ -23,6 +23,7 @@ export class UserController {
     }
 
     @Route('get', '/search')
+    @Scope('admin:read')
     public async search (request: Request, response: Response, _next: NextFunction): Promise<Response> {
         return getService('user').get('/search', request)
             .then((res) => response.status(res.status).json(res.data));

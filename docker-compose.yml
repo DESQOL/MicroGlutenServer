@@ -8,6 +8,7 @@ services:
     container_name: aggregator-service
     depends_on:
       - recipe-service
+      - token-service
       - user-service
     ports:
       - 80:80
@@ -60,6 +61,7 @@ services:
     build: ./user/service
     container_name: user-service
     depends_on:
+      - token-service
       - user-cache
       - user-database
     volumes:
@@ -83,8 +85,6 @@ services:
   user-database:
     image: mysql:5.7.28
     container_name: user-database
-    ports:
-      - 3306:3306
     volumes:
       - './user/database:/var/lib/mysql'
     restart: always
@@ -95,8 +95,20 @@ services:
       MYSQL_PASSWORD: gluten
     networks:
       - user-service
+  
+  #
+  # ---- Token service and related ----
+  token-service:
+    build: ./token/service
+    container_name: token-service
+    volumes:
+      - ./scripts:/opt
+    networks:
+      - services
+      - token-service
 
 networks:
   services:
   user-service:
   recipe-service:
+  token-service:

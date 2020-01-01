@@ -3,6 +3,7 @@ import { createConnection, getRepository } from 'typeorm';
 import { validate } from 'class-validator';
 import { User } from './entity';
 import { databaseConfiguration } from './config';
+import { getService } from './helper';
 
 export default class App {
     private app: Application;
@@ -26,7 +27,7 @@ export default class App {
         async function register (request: Request, response: Response, _next: NextFunction) {
             const { email, password } = request.body;
 
-            const errors = await validate(User.from({ email, password }), { validationError: { target: false, value: false } });
+            const errors = await validate(User.from({ email, password }), { skipMissingProperties: true, validationError: { target: false, value: false } });
             if (errors.length > 0) {
                 return response.status(400).json({
                     message: 'The server could not understand the request due to invalid syntax.',
@@ -46,13 +47,17 @@ export default class App {
             user = await repoUser.save(user);
 
             user = await repoUser.findOne({ where: { email } });
-            response.status(200).json(user);
+
+            const tokenResponse = await getService('token').post('/generate', { user, scope: 'recipe:read' })
+                .then((tokenResponse) => tokenResponse.data);
+
+            response.status(200).json(Object.assign(user, tokenResponse));
         }
 
         async function login (request: Request, response: Response, _next: NextFunction) {
             const { email, password } = request.body;
 
-            const errors = await validate(User.from({ email, password }), { validationError: { target: false, value: false } });
+            const errors = await validate(User.from({ email, password }), { skipMissingProperties: true, validationError: { target: false, value: false } });
             if (errors.length > 0) {
                 return response.status(400).json({
                     message: 'The server could not understand the request due to invalid syntax.',
@@ -74,13 +79,16 @@ export default class App {
                 });
             }
 
-            response.status(200).json(user);
+            const tokenResponse = await getService('token').post('/generate', { user, scope: 'recipe:read' })
+                .then((tokenResponse) => tokenResponse.data);
+
+            response.status(200).json(Object.assign(user, tokenResponse));
         }
 
         async function update (request: Request, response: Response, _next: NextFunction) {
             const { email, password, firstname, lastname } = request.body;
 
-            const errors = await validate(User.from({ email, password, firstname, lastname }), { validationError: { target: false, value: false } });
+            const errors = await validate(User.from({ email, password, firstname, lastname }), { skipMissingProperties: true, validationError: { target: false, value: false } });
             if (errors.length > 0) {
                 return response.status(400).json({
                     message: 'The server could not understand the request due to invalid syntax.',
@@ -134,6 +142,8 @@ export default class App {
         });
 
         this.app.use((err: any, _request: Request, response: Response, _next: NextFunction) => {
+            console.error(err);
+
             response.status(err.status || 500).json({
                 message: err.message,
                 errors: err.errors,

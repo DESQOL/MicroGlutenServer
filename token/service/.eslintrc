@@ -1,0 +1,100 @@
+{
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+        "project": "./tsconfig.json"
+    },
+    "plugins": [
+        "@typescript-eslint",
+        "chai-friendly"
+    ],
+    "extends": [
+        "eslint:recommended",
+        "standard",
+        "plugin:@typescript-eslint/eslint-recommended",
+        "plugin:@typescript-eslint/recommended"
+    ],
+    "rules": {
+        "@typescript-eslint/camelcase": [
+            "error",
+            {
+                "properties": "never"
+            }
+        ],
+        "@typescript-eslint/indent": [
+            "error",
+            4
+        ],
+        "@typescript-eslint/no-inferrable-types": "off",
+        "@typescript-eslint/no-unused-vars": [
+            "error",
+            {
+                "argsIgnorePattern": "^_"
+            }
+        ],
+        "@typescript-eslint/semi": [
+            "error"
+        ],
+        "chai-friendly/no-unused-expressions": 2,
+        "comma-dangle": [
+            "error",
+            "only-multiline"
+        ],
+        "eol-last": [
+            "error",
+            "always"
+        ],
+        "indent": "off",
+        "multiline-comment-style": [
+            "error",
+            "starred-block"
+        ],
+        "no-multiple-empty-lines": [
+            "error",
+            {
+                "max": 1,
+                "maxBOF": 0,
+                "maxEOF": 1
+            }
+        ],
+        "no-trailing-spaces": "error",
+        "no-unused-expressions": 0,
+        "object-curly-spacing": [
+            "error",
+            "always"
+        ],
+        "prefer-arrow-callback": "error",
+        "quote-props": [
+            "error",
+            "as-needed"
+        ],
+        "quotes": [
+            "error",
+            "single",
+            "avoid-escape"
+        ],
+        "semi": "off",
+        "sort-imports": [
+            "error",
+            {
+                "ignoreCase": true,
+                "ignoreDeclarationSort": true,
+                "ignoreMemberSort": false,
+                "memberSyntaxSortOrder": [
+                    "none",
+                    "all",
+                    "multiple",
+                    "single"
+                ]
+            }
+        ],
+        "spaced-comment": [
+            "error",
+            "always",
+            {
+                "block": {
+                    "balanced": true
+                }
+            }
+        ]
+    }
+}

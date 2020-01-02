@@ -4,12 +4,14 @@ import { validate } from 'class-validator';
 import { User } from './entity';
 import { databaseConfiguration } from './config';
 import { getService } from './helper';
+import morgan from 'morgan';
 
 export default class App {
     private app: Application;
 
     constructor () {
         this.app = express();
+        this.app.use(morgan('dev'));
         this.app.use(express.json());
     }
 
@@ -26,6 +28,12 @@ export default class App {
 
         async function register (request: Request, response: Response, _next: NextFunction) {
             const { email, password } = request.body;
+
+            if (!email || !password) {
+                return response.status(400).json({
+                    message: 'The server could not understand the request due to invalid syntax.',
+                });
+            }
 
             const errors = await validate(User.from({ email, password }), { skipMissingProperties: true, validationError: { target: false, value: false } });
             if (errors.length > 0) {
@@ -57,6 +65,12 @@ export default class App {
         async function login (request: Request, response: Response, _next: NextFunction) {
             const { email, password } = request.body;
 
+            if (!email || !password) {
+                return response.status(400).json({
+                    message: 'The server could not understand the request due to invalid syntax.',
+                });
+            }
+
             const errors = await validate(User.from({ email, password }), { skipMissingProperties: true, validationError: { target: false, value: false } });
             if (errors.length > 0) {
                 return response.status(400).json({
@@ -87,6 +101,12 @@ export default class App {
 
         async function update (request: Request, response: Response, _next: NextFunction) {
             const { email, password, firstname, lastname } = request.body;
+
+            if (!email || !password) {
+                return response.status(400).json({
+                    message: 'The server could not understand the request due to invalid syntax.',
+                });
+            }
 
             const errors = await validate(User.from({ email, password, firstname, lastname }), { skipMissingProperties: true, validationError: { target: false, value: false } });
             if (errors.length > 0) {

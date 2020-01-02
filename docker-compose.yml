@@ -2,17 +2,25 @@ version: '3.7'
 
 services:
   #
+  # ---- Balancer service and related ----
+  balancer-service:
+    build: './balancer/service'
+    depends_on:
+      - aggregator-service
+    ports:
+      - 80:80
+      - 443:443
+    networks:
+      - services
+
+  #
   # ---- Aggregator service and related ----
   aggregator-service:
     build: ./aggregator/service
-    container_name: aggregator-service
     depends_on:
       - recipe-service
       - token-service
       - user-service
-    ports:
-      - 80:80
-      - 443:443
     volumes:
       - ./scripts:/opt
     networks:
@@ -22,7 +30,6 @@ services:
   # ---- Recipe service and related ----
   recipe-service:
     build: ./recipe/service
-    container_name: recipe-service
     depends_on:
       - recipe-cache
       - recipe-database
@@ -37,7 +44,6 @@ services:
   
   recipe-cache:
     image: redis:5.0.7
-    container_name: recipe-cache
     volumes:
       - './recipe/cache:/data'
     restart: always
@@ -46,7 +52,6 @@ services:
 
   recipe-database:
     image: mysql:5.7.28
-    container_name: recipe-database
     volumes:
       - './recipe/database:/var/lib/mysql'
     restart: always
@@ -59,7 +64,6 @@ services:
   # ---- User service and related ----
   user-service:
     build: ./user/service
-    container_name: user-service
     depends_on:
       - token-service
       - user-cache
@@ -75,7 +79,6 @@ services:
   
   user-cache:
     image: redis:5.0.7
-    container_name: user-cache
     volumes:
       - './user/cache:/data'
     restart: always
@@ -84,7 +87,6 @@ services:
 
   user-database:
     image: mysql:5.7.28
-    container_name: user-database
     volumes:
       - './user/database:/var/lib/mysql'
     restart: always
@@ -100,7 +102,6 @@ services:
   # ---- Token service and related ----
   token-service:
     build: ./token/service
-    container_name: token-service
     volumes:
       - ./scripts:/opt
     networks:

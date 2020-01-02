@@ -1,12 +1,14 @@
 import express, { Application, NextFunction, Request, Response } from 'express';
 import { UserController } from './controller';
-import { RouteDefinition, MiddlewareDefinition } from './type';
+import { MiddlewareDefinition, RouteDefinition } from './type';
+import morgan from 'morgan';
 
 export default class App {
     private app: Application;
 
     constructor () {
         this.app = express();
+        this.app.use(morgan('dev'));
         this.app.use(express.json());
 
         this.registerRoutes();

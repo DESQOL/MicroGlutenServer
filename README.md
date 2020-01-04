@@ -1,5 +1,7 @@
 # Micro(service) GlutenServer
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/DESQOL/MicroGlutenServer.svg)](https://greenkeeper.io/)
+
 ## Services
 
 ### Aggregator
